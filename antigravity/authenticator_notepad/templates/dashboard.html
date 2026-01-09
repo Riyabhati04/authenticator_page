@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function toggleEdit(taskId) {
+            var display = document.getElementById('task-display-' + taskId);
+            var form = document.getElementById('task-edit-' + taskId);
+            var actions = document.getElementById('task-actions-' + taskId);
+
+            if (display.style.display === 'none') {
+                display.style.display = 'block';
+                actions.style.display = 'flex';
+                form.style.display = 'none';
+            } else {
+                display.style.display = 'none';
+                actions.style.display = 'none';
+                form.style.display = 'flex';
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container dashboard-container">
+        <div class="header-actions">
+            <h1>My Tasks</h1>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Sign Out</a>
+        </div>
+
+        <form action="{{ url_for('create_task') }}" method="POST" class="add-task-form">
+            <input type="text" name="title" placeholder="What needs to be done?" required autocomplete="off">
+            <button type="submit">Add Task</button>
+        </form>
+
+        <ul class="task-list">
+            {% for task in tasks %}
+            <li class="task-item">
+                <div id="task-display-{{ task.id }}" class="task-content" style="flex-grow: 1;">
+                    {{ task.title }}
+                </div>
+
+                <div id="task-edit-{{ task.id }}" style="display: none; flex-grow: 1;">
+                    <form action="{{ url_for('edit_task', id=task.id) }}" method="POST" class="edit-form">
+                        <input type="text" name="title" value="{{ task.title }}" required>
+                        <button type="submit" class="btn-sm">Save</button>
+                        <button type="button" onclick="toggleEdit({{ task.id }})"
+                            class="btn-sm btn-cancel">Cancel</button>
+                    </form>
+                </div>
+
+                <div id="task-actions-{{ task.id }}" class="task-actions">
+                    <button onclick="toggleEdit({{ task.id }})" class="btn-sm btn-edit">Edit</button>
+                    <a href="{{ url_for('delete_task', id=task.id) }}" class="button btn-sm btn-danger"
+                        style="text-decoration: none; display: inline-block; text-align: center;">Delete</a>
+                </div>
+            </li>
+            {% else %}
+            <li class="empty-state">
+                <p>No tasks yet. Add one above to get started!</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+
+</html>
